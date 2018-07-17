@@ -1,21 +1,46 @@
 from django.shortcuts import render, redirect, HttpResponse
-
+from utils.code import check_code
 # Create your views here.
 from django.db.models import Count, Avg, Max
 from django.contrib import auth
 
 from blog.models import Article, UserInfo, Category, Tag, Article2Tag
 
+def code(request):
+    """
+    生成图片验证码
+    :param request:
+    :return:
+    """
+    img,random_code = check_code()
+    request.session['random_code'] = random_code
+    from io import BytesIO
+    stream = BytesIO()
+    img.save(stream, 'png')
+    return HttpResponse(stream.getvalue())
 
 def login(request):
-    if request.method == "POST":
-        user = request.POST.get("user")
-        pwd = request.POST.get("pwd")
-        user = auth.authenticate(username=user, password=pwd)
-        if user:
-            auth.login(request, user)
-            return redirect("/index/")
-    return render(request, "login.html")
+    if request.method == 'GET':
+        return render(request, 'login.html')
+    user = request.POST.get('user')
+    pwd = request.POST.get('pwd')
+    code = request.POST.get('code')
+    if code.upper() != request.session['random_code'].upper():
+        return render(request, 'login.html', {'msg': '验证码错误'})
+
+    user = auth.authenticate(username=user, password=pwd)
+    if user:
+        auth.login(request, user)
+        return redirect("/index/")
+    return render(request, 'login.html', {'msg': '用户名或密码错误'})
+    # if request.method == "POST":
+    #     user = request.POST.get("user")
+    #     pwd = request.POST.get("pwd")
+    #     user = auth.authenticate(username=user, password=pwd)
+    #     if user:
+    #         auth.login(request, user)
+    #         return redirect("/index/")
+    # return render(request, "login.html")
 
 
 def index(request):
