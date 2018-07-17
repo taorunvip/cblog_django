@@ -18,6 +18,9 @@
             z-index: -1;
             position: absolute;
         }
+        .img {
+            background-color: red;
+        }
     </style>
     <script>
         $(document).ready(function () {
@@ -45,11 +48,21 @@
         <dd class="pwd_icon">
             <input type="password" placeholder="密码" class="login_txtbx" name="pwd">
         </dd>
+        <dd class="code_icon">
+            <input type="text" placeholder="验证码" class="login_txtbx" name="code">
+        </dd>
         <dd>
-        <input type="submit" value="立即登陆" class="submit_btn">
+            <img onclick="changeImg(this);" src="/code/" alt="" title="点击更换">
+        </dd>
+        <dd>
+        <input type="submit" value="立即登陆" class="submit_btn">{{ msg }}
     </dd>
     </form>
-
+ <script>
+        function changeImg(ths) {
+            ths.src = ths.src + '?';
+        }
+    </script>
 </dl>
 
 
